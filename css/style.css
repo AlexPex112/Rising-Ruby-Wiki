@@ -330,6 +330,11 @@ footer {
   transition: border-color 0.2s, transform 0.15s;
 }
 .area-card:hover { border-color: var(--accent2); transform: translateX(3px); }
+.area-card--active {
+  border-color: var(--accent2);
+  background: var(--card);
+  transform: translateX(3px);
+}
 .area-meta {
   display: flex;
   gap: 1rem;
@@ -342,7 +347,7 @@ footer {
   border: 1px solid var(--accent);
   border-radius: var(--radius);
   padding: 1.25rem;
-  margin-top: 1.5rem;
+  margin-bottom: 0.6rem;
 }
 .area-detail-header {
   display: flex;
