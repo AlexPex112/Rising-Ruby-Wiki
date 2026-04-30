@@ -1,0 +1,48 @@
+{
+  "usability_changes": [
+    "Deep Sea Scale",
+    "Deep Sea Tooth",
+    "Dragon Scale",
+    "Dubious Disc",
+    "Electirizer",
+    "King's Rock",
+    "Magmarizer",
+    "Metal Coat",
+    "Prism Scale",
+    "Protector",
+    "Reaper Cloth",
+    "Sachet",
+    "Up-Grade",
+    "Whipped Dream"
+  ],
+  "price_changes": [
+    {"item": "Great Ball", "old": "¥600", "new": "¥150"},
+    {"item": "Blastoisinite", "old": "¥0", "new": "¥20,000"},
+    {"item": "Ultra Ball", "old": "¥1,200", "new": "¥300"},
+    {"item": "Cameruptite", "old": "¥0", "new": "¥20,000"},
+    {"item": "Master Ball", "old": "¥0", "new": "¥80,000"},
+    {"item": "Galladite", "old": "¥0", "new": "¥20,000"},
+    {"item": "Heart Scale", "old": "¥100", "new": "¥2,100"},
+    {"item": "Gengarite", "old": "¥0", "new": "¥20,000"},
+    {"item": "Deep Sea Tooth", "old": "¥200", "new": "¥2,100"},
+    {"item": "Garchompite", "old": "¥0", "new": "¥20,000"},
+    {"item": "Deep Sea Scale", "old": "¥200", "new": "¥2,100"},
+    {"item": "Lucarionite", "old": "¥0", "new": "¥20,000"},
+    {"item": "King's Rock", "old": "¥200", "new": "¥2,100"},
+    {"item": "Metagrossite", "old": "¥0", "new": "¥20,000"},
+    {"item": "Metal Coat", "old": "¥200", "new": "¥2,100"},
+    {"item": "Sharpedonite", "old": "¥0", "new": "¥20,000"}
+  ],
+  "shop_inventories": [
+    {"location": "Any Mart, 6 Badges", "inventory": "Poké Ball, Great Ball, Ultra Ball, Hyper Potion, Max Potion, Full Restore, Revive, Full Heal, Escape Rope, Repel, Super Repel, Max Repel, Audinite, Blastoisinite, Cameruptite, Galladite, Gengarite, Lucarionite, Sharpedonite"},
+    {"location": "Any Mart, 7 Badges", "inventory": "Poké Ball, Great Ball, Ultra Ball, Hyper Potion, Max Potion, Full Restore, Revive, Full Heal, Escape Rope, Repel, Super Repel, Max Repel, Audinite, Blastoisinite, Cameruptite, Galladite, Gengarite, Lucarionite, Sharpedonite"},
+    {"location": "Any Mart, 8 Badges", "inventory": "Poké Ball, Great Ball, Ultra Ball, Master Ball, Max Potion, Full Restore, Revive, Full Heal, Escape Rope, Max Repel, Audinite, Blastoisinite, Cameruptite, Galladite, Garchompite, Gengarite, Lucarionite, Metagrossite, Sharpedonite"},
+    {"location": "Slateport Poké Mart", "inventory": "Fire Stone, Water Stone, Leaf Stone, Thunder Stone, Sun Stone, Moon Stone, Whipped Dream, Sachet"},
+    {"location": "Slateport Market", "inventory": "Deep Sea Tooth, Deep Sea Scale, Dragon Scale, King's Rock, Metal Coat, Up-Grade"},
+    {"location": "Verdanturf Poké Mart", "inventory": "Dusk Ball, Luxury Ball, Quick Ball"},
+    {"location": "Fallarbor Poké Mart", "inventory": "Dawn Stone, Dusk Stone, Shiny Stone"},
+    {"location": "Lilycove Poké Mart 2F", "inventory": "Dive Ball, Heal Ball, Nest Ball"},
+    {"location": "Lilycove Poké Mart 3F (TMs)", "inventory": "TM66 Payback, TM74 Gyro Ball, TM84 Poison Jab, TM90 Substitute, TM91 Flash Cannon, TM95 Snarl"},
+    {"location": "Lilycove Poké Mart 3F (Evo Items)", "inventory": "Heart Scale, Dubious Disc, Electirizer, Magmarizer, Protector, Razor Claw, Razor Fang, Reaper Cloth"}
+  ]
+}
