@@ -22,13 +22,12 @@ function toSlug(name) {
   return name.toLowerCase()
     .replace(/♀/g,'-f').replace(/♂/g,'-m')
     .replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùú]/g,'u')
-    .replace(/[\'\u2019]/g,'').replace(/[^a-z0-9]+/g,'-')
+    .replace(/[\'\']/g,'').replace(/[^a-z0-9]+/g,'-')
     .replace(/^-+|-+$/g,'');
 }
 
 function spriteUrl(name) {
   const slug = toSlug(name);
-  // pokesprite on raw.githubusercontent — no hotlink protection, name-indexed
   return `https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/regular/${slug}.png`;
 }
 
@@ -72,7 +71,6 @@ function buildTrainerCard(t) {
 async function loadAreas() {
   const msg = document.getElementById('loadingMsg');
 
-  // Try multiple path variants to handle different hosting setups
   const paths = [
     './data/encounters.json',
     'data/encounters.json',
@@ -87,7 +85,7 @@ async function loadAreas() {
       const res = await fetch(path);
       if (!res.ok) throw new Error(`HTTP ${res.status} at ${path}`);
       data = await res.json();
-      break; // success
+      break;
     } catch (e) {
       lastError = e;
     }
@@ -115,12 +113,16 @@ function renderList(keys) {
     console.error('Element #areaList not found in DOM');
     return;
   }
+  // Remove any open detail panel before re-rendering
+  const existing = document.getElementById('areaDetail');
+  if (existing) existing.remove();
+
   container.innerHTML = keys.map(k => {
     const area = allAreas[k] || {};
     const trainerCount = (area.trainers || []).length;
     const encCount = (area.encounters || []).reduce((s, e) => s + (e.pokemon || []).length, 0);
     const safeKey = k.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
-    return `<div class="area-card" onclick="openArea(\`${safeKey}\`)" data-name="${k.toLowerCase()}">
+    return `<div class="area-card" onclick="openArea(\`${safeKey}\`, this)" data-name="${k.toLowerCase()}">
       <div class="area-title">${k}</div>
       <div class="area-meta">
         <span>🌿 ${encCount} pkm</span>
@@ -130,21 +132,33 @@ function renderList(keys) {
   }).join('');
 }
 
-function openArea(name) {
+function openArea(name, clickedCard) {
   const area = allAreas[name];
   if (!area) return;
 
-  let panel = document.getElementById('areaDetail');
-  if (!panel) {
-    panel = document.createElement('div');
-    panel.id = 'areaDetail';
-    panel.className = 'area-detail';
-    document.querySelector('main, .container, body').appendChild(panel);
+  // Toggle off if same card clicked again
+  const existing = document.getElementById('areaDetail');
+  if (existing && existing.dataset.area === name) {
+    existing.remove();
+    if (clickedCard) clickedCard.classList.remove('area-card--active');
+    return;
   }
+
+  // Remove previous panel and clear active state
+  if (existing) {
+    const prevActive = document.querySelector('.area-card--active');
+    if (prevActive) prevActive.classList.remove('area-card--active');
+    existing.remove();
+  }
+
+  const panel = document.createElement('div');
+  panel.id = 'areaDetail';
+  panel.className = 'area-detail';
+  panel.dataset.area = name;
 
   let html = `<div class="area-detail-header">
     <h2>${name}</h2>
-    <button class="close-detail" onclick="document.getElementById('areaDetail').style.display='none'">✕ Close</button>
+    <button class="close-detail" onclick="closeDetail()">✕ Close</button>
   </div>`;
 
   if (area.encounters && area.encounters.length) {
@@ -173,8 +187,23 @@ function openArea(name) {
   }
 
   panel.innerHTML = html;
-  panel.style.display = 'block';
-  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Insert panel directly after the clicked card (inline), fallback to areaList append
+  if (clickedCard) {
+    clickedCard.classList.add('area-card--active');
+    clickedCard.insertAdjacentElement('afterend', panel);
+  } else {
+    document.getElementById('areaList').appendChild(panel);
+  }
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeDetail() {
+  const panel = document.getElementById('areaDetail');
+  if (panel) panel.remove();
+  const active = document.querySelector('.area-card--active');
+  if (active) active.classList.remove('area-card--active');
 }
 
 function filterAreas() {
