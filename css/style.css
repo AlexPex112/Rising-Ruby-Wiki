@@ -218,3 +218,101 @@ footer {
   .poke-header { flex-direction: column; }
   .filter-bar input { min-width: 0; width: 100%; }
 }
+
+/* ── ENCOUNTER SPRITES ── */
+.enc-method-row { margin-bottom: 0.75rem; }
+.enc-method-label {
+  font-size: 0.82rem;
+  color: var(--accent2);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.enc-sprites { display: flex; flex-wrap: wrap; gap: 4px; }
+.enc-poke {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 62px;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 2px 3px;
+  transition: border-color 0.15s, transform 0.1s;
+  font-size: 0.68rem;
+  text-align: center;
+  line-height: 1.2;
+}
+.enc-poke:hover { border-color: var(--accent2); transform: translateY(-1px); text-decoration: none; }
+.enc-poke img { width: 40px; height: 40px; image-rendering: pixelated; display: block; }
+
+/* ── BOSS TRAINER CARDS ── */
+.boss-card {
+  background: linear-gradient(135deg, #1a0a2e 0%, #0f1a3e 60%, #0f3460 100%);
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 18px rgba(233,69,96,0.25), inset 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+.boss-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.boss-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.85rem; }
+.boss-icon { font-size: 1.4rem; }
+.boss-name { font-size: 1.1rem; font-weight: 700; color: var(--accent2); letter-spacing: 0.02em; }
+.trainer-pokemon-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.trainer-poke {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 64px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 4px 2px 5px;
+  font-size: 0.7rem;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.3;
+}
+.trainer-poke img { width: 48px; height: 48px; image-rendering: pixelated; }
+.trainer-poke small { color: var(--accent2); font-size: 0.65rem; }
+
+/* ── REGULAR TRAINER ROWS ── */
+.trainer-list { display: flex; flex-direction: column; gap: 4px; }
+.trainer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.85rem;
+}
+.trainer-id { color: var(--muted); font-size: 0.75rem; min-width: 32px; }
+.trainer-name { font-weight: 500; min-width: 140px; }
+.trainer-pokemon-inline { display: flex; flex-wrap: wrap; gap: 4px; }
+.trainer-pokemon-inline .trainer-poke { width: 40px; background: transparent; border: none; padding: 0; }
+.trainer-pokemon-inline .trainer-poke img { width: 32px; height: 32px; }
+
+/* ── AREA TITLE ── */
+.area-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent2);
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
