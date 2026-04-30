@@ -1,12 +1,8 @@
-let allAreas = {};
-let areaCards = [];
-
 const METHOD_ICONS = {
   'Grass':'🌿','DexNav':'🔍','Horde':'👥','Surfing':'🌊',
   'Old Rod':'🎣','Good Rod':'🎣','Super Rod':'🎣',
   'Rock Smash':'🪨','Cave':'🕳️','Sand':'🏖️'
 };
-
 const BOSS_KEYWORDS = [
   'gym leader','leader','elite four','champion','rival',
   'brendan','may','wally','steven','wallace','sidney','phoebe',
@@ -14,45 +10,44 @@ const BOSS_KEYWORDS = [
   'norman','winona','tate','liza','juan','archie','maxie'
 ];
 
+let allAreas = {};
+let areaCards = [];
+
 function isBoss(name) {
   const n = name.toLowerCase();
   return BOSS_KEYWORDS.some(k => n.includes(k));
 }
 
-// Converts a Pokemon name to the slug used by PokemonDB's sprite CDN
-function toSprite(name) {
-  return name
-    .toLowerCase()
-    .replace(/♀/g, '-f')
-    .replace(/♂/g, '-m')
-    .replace(/[éèê]/g, 'e')
-    .replace(/[àâ]/g, 'a')
-    .replace(/[\'\u2019]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+function toSlug(name) {
+  return name.toLowerCase()
+    .replace(/♀/g,'-f').replace(/♂/g,'-m')
+    .replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùú]/g,'u')
+    .replace(/[\'\u2019]/g,'').replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'');
 }
 
-// PokemonDB ruby-sapphire sprites - indexed by name slug, perfect for ORAS era
 function spriteUrl(name) {
-  const slug = toSprite(name);
-  return `https://img.pokemondb.net/sprites/ruby-sapphire/normal/${slug}.png`;
+  const slug = toSlug(name);
+  // pokesprite on raw.githubusercontent — no hotlink protection, name-indexed
+  return `https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/regular/${slug}.png`;
 }
 
 function pokemonSpriteLink(p) {
   const url = spriteUrl(p.name);
-  return `<a href="pokemon.html?id=${encodeURIComponent(p.name)}" class="enc-poke" title="${p.name}${p.rare?' (5%)':''}">
-    <img src="${url}" onerror="this.src='https://img.pokemondb.net/sprites/scarlet-violet/icon/${toSprite(p.name)}.png'" loading="lazy">
-    <span>${p.name}${p.rare?'<sup style="color:var(--accent2)">5%</sup>':''}</span>
+  const safe = encodeURIComponent(p.name);
+  return `<a href="pokemon.html?id=${safe}" class="enc-poke" title="${p.name}">
+    <img src="${url}" onerror="this.style.opacity='0.3'" loading="lazy" alt="${p.name}" width="48" height="48">
+    <span>${p.name}${p.rare ? '<sup class="rare-badge">5%</sup>' : ''}</span>
   </a>`;
 }
 
 function buildTrainerCard(t) {
   const boss = isBoss(t.name);
-  const pokeHtml = t.pokemon.map(p => {
+  const pokeHtml = (t.pokemon || []).map(p => {
     const url = spriteUrl(p.name);
     return `<div class="trainer-poke">
-      <img src="${url}" onerror="this.src='https://img.pokemondb.net/sprites/scarlet-violet/icon/${toSprite(p.name)}.png'" loading="lazy">
-      <span>${p.name}${p.level?'<br><small>Lv.'+p.level+'</small>':''}</span>
+      <img src="${url}" onerror="this.style.opacity='0.3'" loading="lazy" alt="${p.name}" width="48" height="48">
+      <span>${p.name}${p.level ? '<br><small>Lv.' + p.level + '</small>' : ''}</span>
     </div>`;
   }).join('');
 
@@ -62,37 +57,73 @@ function buildTrainerCard(t) {
         <span class="boss-icon">⚔️</span>
         <div>
           <div class="boss-name">${t.name}</div>
-          <div style="color:var(--muted);font-size:0.75rem">Trainer #${t.id}</div>
+          <div class="boss-sub">Trainer #${t.id || '?'}</div>
         </div>
       </div>
-      <div class="boss-team">${pokeHtml}</div>
+      <div class="boss-team">${pokeHtml || '<em style="color:#aaa">No team data</em>'}</div>
     </div>`;
   }
   return `<div class="trainer-card">
-    <div class="trainer-name">${t.name} <small style="color:var(--muted)">#${t.id}</small></div>
+    <div class="trainer-name">${t.name} <small>#${t.id || '?'}</small></div>
     <div class="trainer-team">${pokeHtml}</div>
   </div>`;
 }
 
 async function loadAreas() {
-  const res = await fetch('data/encounters.json');
-  allAreas = await res.json();
-  areaCards = Object.keys(allAreas);
+  const msg = document.getElementById('loadingMsg');
+
+  // Try multiple path variants to handle different hosting setups
+  const paths = [
+    './data/encounters.json',
+    'data/encounters.json',
+    '../data/encounters.json'
+  ];
+
+  let data = null;
+  let lastError = null;
+
+  for (const path of paths) {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`HTTP ${res.status} at ${path}`);
+      data = await res.json();
+      break; // success
+    } catch (e) {
+      lastError = e;
+    }
+  }
+
+  if (!data) {
+    if (msg) msg.innerHTML = `<span style="color:#e74c3c">⚠ Failed to load encounters.json<br><small>${lastError?.message || 'Unknown error'}</small></span>`;
+    return;
+  }
+
+  allAreas = data;
+  areaCards = Object.keys(data);
+
+  if (msg) msg.style.display = 'none';
+
+  const cnt = document.getElementById('areaCount');
+  if (cnt) cnt.textContent = areaCards.length + ' areas';
+
   renderList(areaCards);
 }
 
 function renderList(keys) {
-  const container = document.getElementById('area-list');
-  if (!container) return;
+  const container = document.getElementById('areaList');
+  if (!container) {
+    console.error('Element #areaList not found in DOM');
+    return;
+  }
   container.innerHTML = keys.map(k => {
-    const area = allAreas[k];
-    const trainerCount = (area.trainers||[]).length;
-    const encounterCount = (area.encounters||[]).reduce((s,e)=>s+(e.pokemon||[]).length,0);
-    return `<div class="area-card" onclick="openArea('${k.replace(/'/g,"\\'")}')"
-      data-name="${k.toLowerCase()}">
+    const area = allAreas[k] || {};
+    const trainerCount = (area.trainers || []).length;
+    const encCount = (area.encounters || []).reduce((s, e) => s + (e.pokemon || []).length, 0);
+    const safeKey = k.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
+    return `<div class="area-card" onclick="openArea(\`${safeKey}\`)" data-name="${k.toLowerCase()}">
       <div class="area-title">${k}</div>
       <div class="area-meta">
-        <span>🌿 ${encounterCount} encounters</span>
+        <span>🌿 ${encCount} pkm</span>
         <span>🧑 ${trainerCount} trainers</span>
       </div>
     </div>`;
@@ -102,47 +133,56 @@ function renderList(keys) {
 function openArea(name) {
   const area = allAreas[name];
   if (!area) return;
-  const panel = document.getElementById('area-detail');
-  if (!panel) return;
 
-  let html = `<h2>${name}</h2>`;
+  let panel = document.getElementById('areaDetail');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'areaDetail';
+    panel.className = 'area-detail';
+    document.querySelector('main, .container, body').appendChild(panel);
+  }
 
-  // Encounters
+  let html = `<div class="area-detail-header">
+    <h2>${name}</h2>
+    <button class="close-detail" onclick="document.getElementById('areaDetail').style.display='none'">✕ Close</button>
+  </div>`;
+
   if (area.encounters && area.encounters.length) {
-    html += '<h3>Wild Encounters</h3>';
+    html += '<h3 class="section-sub">🌿 Wild Encounters</h3>';
     area.encounters.forEach(enc => {
       const icon = METHOD_ICONS[enc.method] || '❓';
       html += `<div class="enc-group">
-        <div class="enc-method">${icon} ${enc.method}${enc.level?' — Lv.'+enc.level:''}</div>
-        <div class="enc-grid">${(enc.pokemon||[]).map(pokemonSpriteLink).join('')}</div>
+        <div class="enc-method">${icon} ${enc.method}${enc.level ? ' — Lv.' + enc.level : ''}</div>
+        <div class="enc-grid">${(enc.pokemon || []).map(pokemonSpriteLink).join('')}</div>
       </div>`;
     });
   }
 
-  // Trainers
   if (area.trainers && area.trainers.length) {
-    html += '<h3>Trainers</h3>';
+    html += '<h3 class="section-sub">🧑 Trainers</h3>';
     area.trainers.forEach(t => { html += buildTrainerCard(t); });
   }
 
-  // Rematches
   if (area.rematches && area.rematches.length) {
-    html += '<h3>Rematches</h3>';
+    html += '<h3 class="section-sub">🔁 Rematches</h3>';
     area.rematches.forEach(t => { html += buildTrainerCard(t); });
   }
 
+  if (!area.encounters?.length && !area.trainers?.length && !area.rematches?.length) {
+    html += '<p style="padding:1rem 0;color:var(--muted)">No data available for this area.</p>';
+  }
+
   panel.innerHTML = html;
-  panel.scrollIntoView({behavior:'smooth'});
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadAreas();
-  const search = document.getElementById('area-search');
-  if (search) {
-    search.addEventListener('input', () => {
-      const q = search.value.toLowerCase();
-      const filtered = areaCards.filter(k => k.toLowerCase().includes(q));
-      renderList(filtered);
-    });
-  }
-});
+function filterAreas() {
+  const q = (document.getElementById('areaSearch')?.value || '').toLowerCase().trim();
+  const filtered = q ? areaCards.filter(k => k.toLowerCase().includes(q)) : areaCards;
+  renderList(filtered);
+  const cnt = document.getElementById('areaCount');
+  if (cnt) cnt.textContent = filtered.length + ' areas';
+}
+
+document.addEventListener('DOMContentLoaded', loadAreas);
